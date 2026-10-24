@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { exportWordSearchBook } from "./pdf/exportPdf";
 import { THEMES } from "./data/themes";
-import { THEMES_EN } from "./data/themesEn";
+import { THEMES_EN as BASE_EN } from "./data/themesEn";
+import { THEMES_MORE } from "./data/themesMore";
+const THEMES_EN = { ...BASE_EN, ...THEMES_MORE };
 
 const ALL_THEMES = {
   ...THEMES_EN,
@@ -94,7 +96,7 @@ export default function App() {
 
       <label>Word theme</label>
       <select style={box} value={theme} onChange={(e) => onTheme(e.target.value)}>
-        {Object.entries(ALL_THEMES).map(([k, t]) => (
+        {Object.entries(ALL_THEMES).sort((a, b) => a[1].label.localeCompare(b[1].label)).map(([k, t]) => (
           <option key={k} value={k}>{t.label}</option>
         ))}
         <option value="custom">Custom (type your own)</option>
