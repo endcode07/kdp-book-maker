@@ -1,4 +1,6 @@
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { PDFDocument, rgb } from "pdf-lib";
+import fontkit from "@pdf-lib/fontkit";
+import { loadFonts } from "./fonts";
 import { TRIM } from "./trimSizes";
 import { PUZZLES } from "../puzzles";
 
@@ -15,10 +17,12 @@ export async function buildBook({ trim, title, author, lang, blankBack, sections
   const L = COMMON[lang] || COMMON.en;
   const { w, h } = TRIM[trim];
   const pdf = await PDFDocument.create();
+  pdf.registerFontkit(fontkit);
+  const F = await loadFonts();
   const fonts = {
-    reg: await pdf.embedFont(StandardFonts.Helvetica),
-    hb: await pdf.embedFont(StandardFonts.HelveticaBold),
-    mono: await pdf.embedFont(StandardFonts.CourierBold),
+    reg: await pdf.embedFont(F.reg, { subset: true }),
+    hb: await pdf.embedFont(F.bold, { subset: true }),
+    mono: await pdf.embedFont(F.mono, { subset: true }),
   };
 
   const parts = [];

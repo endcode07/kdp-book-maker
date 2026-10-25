@@ -2,19 +2,19 @@ import { rgb } from "pdf-lib";
 
 const ORDER = ["easy", "medium", "hard", "expert"];
 const HINTS = { easy: 3, medium: 2, hard: 1, expert: 0 };
-const PER_PAGE = 2;
+const PER = { easy: 3, medium: 3, hard: 2, expert: 2 };
 const AZ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 const TEXT = {
   en: {
       name: "Cryptogram", hint: "Hint",
           levels: { easy: "Easy", medium: "Medium", hard: "Hard", expert: "Expert" },
-              howto: ["1. Each letter stands for another letter.", "2. Decode each secret message.", "3. Write the real letter on the lines.", "4. Use the hints to get started."],
+              howto: ["1. Each letter stands for another letter.", "2. Decode each secret message.", "3. Write the real letter on the lines.", "4. Use the hints to get started.", "5. Every phrase has its own code."],
                 },
                   ms: {
                       name: "Kriptogram", hint: "Petunjuk",
                           levels: { easy: "Mudah", medium: "Sederhana", hard: "Susah", expert: "Pakar" },
-                              howto: ["1. Setiap huruf mewakili huruf lain.", "2. Pecahkan setiap mesej rahsia.", "3. Tulis huruf sebenar pada garisan.", "4. Gunakan petunjuk untuk bermula."],
+                              howto: ["1. Setiap huruf mewakili huruf lain.", "2. Pecahkan setiap mesej rahsia.", "3. Tulis huruf sebenar pada garisan.", "4. Gunakan petunjuk untuk bermula.", "5. Setiap ayat ada kod sendiri."],
                                 },
                                 };
 
@@ -100,14 +100,14 @@ const TEXT = {
                                                                                                                                                                                                                         s.words.split("\n").map(cleanPhrase)
                                                                                                                                                                                                                                 .filter((x) => x.replace(/[^A-Z]/g, "").length >= 10 && x.length <= 110)
                                                                                                                                                                                                                                     )];
-                                                                                                                                                                                                                                        if (phrases.length < PER_PAGE) {
-                                                                                                                                                                                                                                              throw new Error("Cryptogram needs at least 2 phrases (10 to 110 characters each, one per line).");
+                                                                                                                                                                                                                                        if (phrases.length < 3) {
+                                                                                                                                                                                                                                              throw new Error("Cryptogram needs at least 3 phrases (10 to 110 characters each, one per line).");
                                                                                                                                                                                                                                                   }
                                                                                                                                                                                                                                                       const deal = makeDealer(phrases);
                                                                                                                                                                                                                                                           const out = [];
                                                                                                                                                                                                                                                               for (let i = 0; i < s.count; i++) {
                                                                                                                                                                                                                                                                     const lv = s.level === "mixed" ? ORDER[Math.min(3, Math.floor((i * 4) / s.count))] : s.level;
-                                                                                                                                                                                                                                                                          out.push({ items: deal(PER_PAGE).map((ph) => makeItem(ph, lv)), level: lv });
+                                                                                                                                                                                                                                                                          out.push({ items: deal(PER[lv]).map((ph) => makeItem(ph, lv)), level: lv });
                                                                                                                                                                                                                                                                               }
                                                                                                                                                                                                                                                                                   return out;
                                                                                                                                                                                                                                                                                     },
