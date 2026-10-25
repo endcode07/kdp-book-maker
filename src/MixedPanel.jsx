@@ -1,13 +1,18 @@
 import { useState } from "react";
 import { buildBook } from "./pdf/bookBuilder";
 import { ALL_THEMES } from "./data/allThemes";
+import { PHRASES } from "./data/phrases";
 
 let uid = 1;
-const LABEL = { wordsearch: "Word Search", sudoku: "Sudoku", maze: "Maze", scramble: "Word Scramble" };
-const newSection = (type) =>
+const LABEL = { wordsearch: "Word Search", sudoku: "Sudoku", maze: "Maze", scramble: "Word Scramble", cryptogram: "Cryptogram" };
+const newSection0 = (type) =>
   type === "sudoku" || type === "maze"
       ? { id: uid++, type, count: 20, level: "mixed" }
           : { id: uid++, type, count: 20, level: type === "scramble" ? "mixed" : "mudah", theme: "animals", words: ALL_THEMES.animals.words.join(", ") };
+const newSection = (type) =>
+  type === "cryptogram"
+    ? { id: uid++, type, count: 20, level: "mixed", phraseSet: "en", words: PHRASES.en.join("\n") }
+    : newSection0(type);
 
           const box = { display: "block", width: "100%", padding: 8, marginBottom: 10, boxSizing: "border-box" };
           const card = { border: "1px solid #999", borderRadius: 6, padding: 12, marginBottom: 12 };
@@ -114,7 +119,19 @@ const newSection = (type) =>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 </select>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           )}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    {(s.type === "wordsearch" || s.type === "scramble") && (
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    {s.type === "cryptogram" && (
+            <>
+              <label>Phrase set</label>
+              <select style={box} value={s.phraseSet} onChange={(e) => patch(s.id, { phraseSet: e.target.value, words: e.target.value === "custom" ? "" : PHRASES[e.target.value].join("\n") })}>
+                <option value="en">English proverbs</option>
+                <option value="ms">Peribahasa Melayu</option>
+                <option value="custom">Custom (one phrase per line)</option>
+              </select>
+              <label>Phrases (one per line, editable)</label>
+              <textarea style={box} rows={5} value={s.words} onChange={(e) => patch(s.id, { words: e.target.value })} />
+            </>
+          )}
+          {(s.type === "wordsearch" || s.type === "scramble") && (
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 <>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               <label>Word theme</label>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             <select style={box} value={s.theme} onChange={(e) => onTheme(s.id, e.target.value)}>
@@ -133,6 +150,7 @@ const newSection = (type) =>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 <button style={{ flex: "1 1 45%", padding: 10 }} onClick={() => add("sudoku")}>+ Sudoku</button>
         <button style={{ flex: "1 1 45%", padding: 10 }} onClick={() => add("maze")}>+ Maze</button>
         <button style={{ flex: "1 1 45%", padding: 10 }} onClick={() => add("scramble")}>+ Scramble</button>
+        <button style={{ flex: "1 1 45%", padding: 10 }} onClick={() => add("cryptogram")}>+ Cryptogram</button>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       </div>
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             {err && <p style={{ color: "crimson" }}>{err}</p>}
