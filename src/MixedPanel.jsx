@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { buildBook } from "./pdf/bookBuilder";
+import { useState, useEffect } from "react";
+import { buildBook, estimatePages } from "./pdf/bookBuilder";
 import { ALL_THEMES } from "./data/allThemes";
 import { PHRASES } from "./data/phrases";
 
@@ -18,7 +18,7 @@ const newSection = (type) =>
           const card = { border: "1px solid #999", borderRadius: 6, padding: 12, marginBottom: 12 };
           const small = { padding: "4px 10px", marginLeft: 6 };
 
-          export default function MixedPanel() {
+          export default function MixedPanel({ onPages }) {
             const [title, setTitle] = useState("Puzzle Activity Book");
               const [author, setAuthor] = useState("");
                 const [trim, setTrim] = useState("6x9");
@@ -45,6 +45,15 @@ const newSection = (type) =>
                                                                                     patch(id, { theme: k, words: k === "custom" ? "" : ALL_THEMES[k].words.join(", ") });
 
                                                                                       const total = sections.reduce((a, s) => a + Number(s.count || 0), 0);
+
+  const pages = estimatePages(sections, blankBack);
+  useEffect(() => { if (onPages) onPages(pages); }, [pages]);
+  const warns = [];
+  if (!sections.length) warns.push("Add at least one section.");
+  if (!title.trim()) warns.push("Book title is empty.");
+  if (!author.trim()) warns.push("Author name is empty (shown on title and copyright pages).");
+  if (pages > 776) warns.push("Over 776 pages: may exceed KDP's maximum for some paper types.");
+  if (!blankBack) warns.push("Puzzles on both sides: ink may show through. Many buyers prefer blank backs.");
 
                                                                                         const generate = async () => {
                                                                                             setBusy(true);
@@ -153,7 +162,13 @@ const newSection = (type) =>
         <button style={{ flex: "1 1 45%", padding: 10 }} onClick={() => add("cryptogram")}>+ Cryptogram</button>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       </div>
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            {err && <p style={{ color: "crimson" }}>{err}</p>}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div style={{ border: "1px solid #999", borderRadius: 6, padding: 10, marginBottom: 12, background: "#f6f6f6", color: "#222" }}>
+        <strong>Pre-flight:</strong> {total} puzzles, {pages} pages (auto-filled in the Cover tab)
+        {warns.map((w, i) => <div key={i} style={{ color: "#b45309", marginTop: 4 }}>! {w}</div>)}
+        {!warns.length && <div style={{ color: "#166534", marginTop: 4 }}>No problems found.</div>}
+      </div>
+
+      {err && <p style={{ color: "crimson" }}>{err}</p>}
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   <button onClick={generate} disabled={busy} style={{ padding: 12, width: "100%" }}>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           {busy ? "Generating (may take a few seconds)..." : "Generate PDF"}
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 </button>

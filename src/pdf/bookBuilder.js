@@ -12,6 +12,33 @@ const COMMON = {
 const gutterFor = (n) => (n <= 150 ? 27 : n <= 300 ? 36 : n <= 500 ? 45 : n <= 700 ? 54 : 63);
 const OUTER = 36, TOP = 45, BOTTOM = 45;
 
+function buildSpecs(parts, blankBack) {
+  const specs = [{ type: "title" }, { type: "copyright" }, { type: "owner" }, { type: "blank" }];
+  parts.forEach((pt, pi) => {
+    if (specs.length % 2 === 1) specs.push({ type: "blank" });
+    specs.push({ type: "divider", pt, pi }, { type: "blank" });
+    pt.puzzles.forEach((p, i) => {
+      specs.push({ type: "puzzle", pt, p, n: i + 1 });
+      if (blankBack) specs.push({ type: "blank" });
+    });
+  });
+  if (specs.length % 2 === 1) specs.push({ type: "blank" });
+  specs.push({ type: "ansTitle" }, { type: "blank" });
+  const PER = 6;
+  parts.forEach((pt, pi) => {
+    for (let i = 0; i < pt.puzzles.length; i += PER) {
+      specs.push({ type: "answers", pt, pi, items: pt.puzzles.slice(i, i + PER).map((p, k) => ({ p, n: i + k + 1 })) });
+    }
+  });
+  while (specs.length < 24 || specs.length % 2 === 1) specs.push({ type: "blank" });
+  return specs;
+}
+
+export function estimatePages(sections, blankBack) {
+  const parts = sections.map((s) => ({ puzzles: Array(Math.max(1, Number(s.count) || 1)).fill(null) }));
+  return buildSpecs(parts, blankBack).length;
+}
+
 export async function buildBook({ trim, title, author, lang, blankBack, sections }) {
   if (!sections.length) throw new Error("Add at least one section.");
   const L = COMMON[lang] || COMMON.en;
@@ -31,24 +58,7 @@ export async function buildBook({ trim, title, author, lang, blankBack, sections
     parts.push({ s, mod, name: mod.name(lang), puzzles: mod.generate(s) });
   }
 
-  const specs = [{ type: "title" }, { type: "copyright" }, { type: "owner" }, { type: "blank" }];
-  parts.forEach((pt, pi) => {
-    if (specs.length % 2 === 1) specs.push({ type: "blank" });
-    specs.push({ type: "divider", pt, pi }, { type: "blank" });
-    pt.puzzles.forEach((p, i) => {
-      specs.push({ type: "puzzle", pt, p, n: i + 1 });
-      if (blankBack) specs.push({ type: "blank" });
-    });
-  });
-  if (specs.length % 2 === 1) specs.push({ type: "blank" });
-  specs.push({ type: "ansTitle" }, { type: "blank" });
-  const PER = 6;
-  parts.forEach((pt, pi) => {
-    for (let i = 0; i < pt.puzzles.length; i += PER) {
-      specs.push({ type: "answers", pt, pi, items: pt.puzzles.slice(i, i + PER).map((p, k) => ({ p, n: i + k + 1 })) });
-    }
-  });
-  while (specs.length < 24 || specs.length % 2 === 1) specs.push({ type: "blank" });
+  const specs = buildSpecs(parts, blankBack);
 
   const gutter = gutterFor(specs.length);
 
