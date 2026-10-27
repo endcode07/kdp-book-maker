@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { buildBook, estimatePages } from "./pdf/bookBuilder";
 import { ALL_THEMES } from "./data/allThemes";
 import { PHRASES } from "./data/phrases";
+import { CLUE_SETS, clueText } from "./data/crosswordClues";
 
 let uid = 1;
-const LABEL = { wordsearch: "Word Search", sudoku: "Sudoku", maze: "Maze", scramble: "Word Scramble", cryptogram: "Cryptogram", mathsquare: "Math Squares", numbersearch: "Number Search" };
+const LABEL = { wordsearch: "Word Search", sudoku: "Sudoku", maze: "Maze", scramble: "Word Scramble", cryptogram: "Cryptogram", mathsquare: "Math Squares", numbersearch: "Number Search", crossword: "Crossword" };
 const newSection0 = (type) =>
   type === "sudoku" || type === "maze" || type === "mathsquare" || type === "numbersearch"
       ? { id: uid++, type, count: 20, level: "mixed" }
@@ -12,6 +13,8 @@ const newSection0 = (type) =>
 const newSection = (type) =>
   type === "cryptogram"
     ? { id: uid++, type, count: 20, level: "mixed", phraseSet: "en", words: PHRASES.en.join("\n") }
+    : type === "crossword"
+    ? { id: uid++, type, count: 20, level: "mixed", clueSet: "en_animals", words: clueText("en_animals") }
     : newSection0(type);
 
           const box = { display: "block", width: "100%", padding: 8, marginBottom: 10, boxSizing: "border-box" };
@@ -139,7 +142,18 @@ const newSection = (type) =>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 </select>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           )}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    {s.type === "cryptogram" && (
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    {s.type === "crossword" && (
+            <>
+              <label>Clue set</label>
+              <select style={box} value={s.clueSet} onChange={(e) => patch(s.id, { clueSet: e.target.value, words: e.target.value === "custom" ? "" : clueText(e.target.value) })}>
+                {Object.entries(CLUE_SETS).map(([k, t]) => <option key={k} value={k}>{t.label}</option>)}
+                <option value="custom">Custom (WORD: clue, one per line)</option>
+              </select>
+              <label>Words and clues (editable)</label>
+              <textarea style={box} rows={6} value={s.words} onChange={(e) => patch(s.id, { words: e.target.value })} />
+            </>
+          )}
+          {s.type === "cryptogram" && (
             <>
               <label>Phrase set</label>
               <select style={box} value={s.phraseSet} onChange={(e) => patch(s.id, { phraseSet: e.target.value, words: e.target.value === "custom" ? "" : PHRASES[e.target.value].join("\n") })}>
@@ -175,6 +189,7 @@ const newSection = (type) =>
         <button style={{ flex: "1 1 45%", padding: 10 }} onClick={() => add("cryptogram")}>+ Cryptogram</button>
         <button style={{ flex: "1 1 45%", padding: 10 }} onClick={() => add("mathsquare")}>+ Math Squares</button>
         <button style={{ flex: "1 1 45%", padding: 10 }} onClick={() => add("numbersearch")}>+ Number Search</button>
+        <button style={{ flex: "1 1 45%", padding: 10 }} onClick={() => add("crossword")}>+ Crossword</button>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       </div>
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             <div style={{ border: "1px solid #999", borderRadius: 6, padding: 10, marginBottom: 12, background: "#f6f6f6", color: "#222" }}>
