@@ -4,9 +4,9 @@ import { ALL_THEMES } from "./data/allThemes";
 import { PHRASES } from "./data/phrases";
 
 let uid = 1;
-const LABEL = { wordsearch: "Word Search", sudoku: "Sudoku", maze: "Maze", scramble: "Word Scramble", cryptogram: "Cryptogram" };
+const LABEL = { wordsearch: "Word Search", sudoku: "Sudoku", maze: "Maze", scramble: "Word Scramble", cryptogram: "Cryptogram", mathsquare: "Math Squares" };
 const newSection0 = (type) =>
-  type === "sudoku" || type === "maze"
+  type === "sudoku" || type === "maze" || type === "mathsquare"
       ? { id: uid++, type, count: 20, level: "mixed" }
           : { id: uid++, type, count: 20, level: type === "scramble" ? "mixed" : "mudah", theme: "animals", words: ALL_THEMES.animals.words.join(", ") };
 const newSection = (type) =>
@@ -173,6 +173,7 @@ const newSection = (type) =>
         <button style={{ flex: "1 1 45%", padding: 10 }} onClick={() => add("maze")}>+ Maze</button>
         <button style={{ flex: "1 1 45%", padding: 10 }} onClick={() => add("scramble")}>+ Scramble</button>
         <button style={{ flex: "1 1 45%", padding: 10 }} onClick={() => add("cryptogram")}>+ Cryptogram</button>
+        <button style={{ flex: "1 1 45%", padding: 10 }} onClick={() => add("mathsquare")}>+ Math Squares</button>
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       </div>
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             <div style={{ border: "1px solid #999", borderRadius: 6, padding: 10, marginBottom: 12, background: "#f6f6f6", color: "#222" }}>
